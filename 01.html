@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>독도 수호대: 역사 왜곡을 막아라!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            background-color: #1a202c;
+        }
+        
+        .font-jua {
+            font-family: 'Jua', sans-serif;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, #87CEEB 0%, #1E90FF 50%, #000080 100%);
+            overflow: hidden;
+        }
+
+        .modal {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Wave Effect for Sea */
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.2C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%23FFFFFF"/></svg>') repeat-x;
+            background-size: 50% 100%;
+            animation: wave 10s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .wave:nth-of-type(2) {
+            bottom: 10px;
+            opacity: 0.5;
+            animation: wave 7s linear infinite reverse;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .quiz-btn {
+            transition: all 0.2s;
+        }
+        .quiz-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- Background Waves -->
+    <div class="wave"></div>
+    <div class="wave"></div>
+
+    <!-- Canvas for Game Rendering -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- UI Overlay: Score & Health -->
+    <div class="absolute top-4 left-4 flex flex-col gap-2 z-10 text-white font-jua text-shadow-md">
+        <div class="text-2xl">점수: <span id="scoreDisplay">0</span></div>
+        <div class="text-xl text-red-300">방어막: <span id="healthDisplay">100</span>%</div>
+        <div class="text-sm text-gray-200">레벨: <span id="levelDisplay">1</span></div>
+    </div>
+
+    <!-- Home Button (Modified) -->
+    <a href="index.html" class="absolute top-4 right-4 z-50 px-6 py-2 bg-blue-600 hover:bg-blue-500 border-2 border-blue-300 text-white font-jua rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 text-lg tracking-wide flex items-center gap-2 decoration-none">
+        <span>🏠</span>
+        <span>홈으로</span>
+    </a>
+
+    <!-- Start Screen -->
+    <div id="startScreen" class="absolute inset-0 flex items-center justify-center z-50 bg-black/60">
+        <div class="modal p-8 text-center max-w-md w-full mx-4 border-4 border-blue-500">
+            <h1 class="text-4xl font-jua text-blue-600 mb-2">독도 수호대</h1>
+            <h2 class="text-xl font-bold text-gray-700 mb-6">역사 왜곡을 막아라!</h2>
+            <div class="mb-6 text-left text-gray-600 space-y-2 text-sm">
+                <p>👻 <b>왜곡 유령</b>들이 독도에 다가옵니다.</p>
+                <p>👆 유령을 <b>클릭(터치)</b>하여 물리치세요!</p>
+                <p>🧠 가끔 나타나는 <b>퀴즈</b>를 맞히면 방어막이 회복됩니다.</p>
+                <p>📚 <b>자료 기반:</b> 제공해주신 독도 학습 자료를 바탕으로 합니다.</p>
+            </div>
+            <button onclick="startGame()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg text-xl shadow-lg transform transition hover:-translate-y-1">
+                수호 시작하기!
+            </button>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="hidden absolute inset-0 flex items-center justify-center z-40 bg-black/70">
+        <div class="modal p-6 max-w-lg w-full mx-4 border-4 border-yellow-400">
+            <div class="flex justify-between items-center mb-4">
+                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">독도 지식 체크</span>
+                <span id="quizTimer" class="text-red-500 font-bold">15s</span>
+            </div>
+            <h3 id="quizQuestion" class="text-xl font-bold text-gray-800 mb-6 leading-relaxed">
+                문제 내용이 여기에 표시됩니다.
+            </h3>
+            <div id="quizOptions" class="grid gap-3">
+                <!-- Options will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="hidden absolute inset-0 flex items-center justify-center z-50 bg-black/80">
+        <div class="modal p-8 text-center max-w-md w-full mx-4 border-4 border-red-500">
+            <h2 class="text-3xl font-jua text-red-600 mb-4">방어 실패...</h2>
+            <p class="text-gray-700 mb-2">최종 점수</p>
+            <p id="finalScore" class="text-4xl font-bold text-gray-900 mb-6">0</p>
+            <p class="text-sm text-gray-500 mb-6">독도에 대한 정확한 지식이<br>우리 땅을 지키는 힘입니다!</p>
+            <button onclick="resetGame()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-4 rounded-lg text-xl shadow-lg">
+                다시 도전하기
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /**
+     * Game Data derived from uploaded PDFs
+     */
+    const QUIZ_DATA = [
+        {
+            q: "독도의 행정 구역상 주소는 경상북도 울릉군 울릉읍 OOO 이다. 빈칸에 들어갈 말은?",
+            a: ["독도리", "우산리", "죽도리", "석도리"],
+            correct: 0,
+            desc: "독도의 주소는 경상북도 울릉군 울릉읍 독도리 1~96번지입니다."
+        },
+        {
+            q: "1900년 대한제국 칙령 제41호에서 독도를 지칭한 명칭은?",
+            a: ["석도(石島)", "죽도(竹島)", "송도(松島)", "우산도"],
+            correct: 0,
+            desc: "대한제국은 칙령 제41호를 통해 울릉도를 울도군으로 승격시키고, 관할 구역으로 석도(독도)를 명시했습니다."
+        },
+        {
+            q: "독도 주변 해역에 매장된 '불타는 얼음'이라 불리는 미래 에너지 자원은?",
+            a: ["가스 하이드레이트", "천연가스", "석유", "망간단괴"],
+            correct: 0,
+            desc: "독도 인근에는 메탄이 주성분인 가스 하이드레이트가 풍부하게 매장되어 있습니다."
+        },
+        {
+            q: "조선 숙종 때(1696년) 일본으로 건너가 독도가 조선 땅임을 확인받고 돌아온 인물은?",
+            a: ["안용복", "이사부", "이순신", "심흥택"],
+            correct: 0,
+            desc: "안용복은 두 차례 일본으로 건너가 울릉도와 독도가 조선의 영토임을 강력히 주장하고 일본 막부의 인정을 받아냈습니다."
+        },
+        {
+            q: "독도는 크게 두 개의 섬으로 이루어져 있다. 두 섬의 이름은?",
+            a: ["동도와 서도", "남도와 북도", "우산도와 죽도", "대도와 소도"],
+            correct: 0,
+            desc: "독도는 동도와 서도 2개의 큰 섬과 89개의 부속 도서로 이루어져 있습니다."
+        },
+        {
+            q: "일본 시마네현이 불법적으로 다케시마의 날로 정한 날짜는?",
+            a: ["2월 22일", "10월 25일", "8월 15일", "3월 1일"],
+            correct: 0,
+            desc: "일본은 1905년 시마네현 고시 제40호를 근거로 2월 22일을 다케시마의 날로 주장하지만, 이는 불법적인 편입입니다. (독도의 날은 10월 25일)"
+        },
+        {
+            q: "해수면 아래에서 형성된 화산체인 독도와 울릉도 같은 지형을 무엇이라 하는가?",
+            a: ["해산 (Seamount)", "대륙붕", "해구", "산호초"],
+            correct: 0,
+            desc: "독도와 울릉도는 해저 약 2,000m에서 솟아오른 거대한 해산(Seamount)의 윗부분입니다."
+        },
+        {
+            q: "1785년 일본 실학자 하야시 시헤이가 제작한 지도로, 독도를 조선의 색(황색)으로 칠한 지도는?",
+            a: ["삼국접양지도", "대동여지도", "혼일강리역대국도지도", "개정일본여지로정전도"],
+            correct: 0,
+            desc: "삼국접양지도는 울릉도와 독도를 조선 본토와 같은 황색으로 채색하여 조선의 영토임을 명확히 했습니다."
+        }
+    ];
+
+    /* --- Game Constants & State --- */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let gameState = 'start'; // start, playing, quiz, gameover
+    let score = 0;
+    let health = 100;
+    let level = 1;
+    let lastTime = 0;
+    let spawnTimer = 0;
+    let spawnInterval = 2000;
+    let enemies = [];
+    let particles = [];
+    let quizIntervalCounter = 0;
+    let quizThreshold = 1000; // Show quiz every 1000 points
+    let currentQuizIndex = -1;
+    let quizTimerInterval;
+
+    // Dokdo Asset Representation
+    const DOKDO = {
+        x: 0, y: 0, 
+        radius: 60,
+        color: '#4ADE80' // Green
+    };
+
+    /* --- Resize Handling --- */
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        DOKDO.x = canvas.width / 2;
+        DOKDO.y = canvas.height / 2;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    /* --- Game Logic --- */
+
+    function startGame() {
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('gameOverScreen').classList.add('hidden');
+        resetGameState();
+        gameState = 'playing';
+        requestAnimationFrame(gameLoop);
+    }
+
+    function resetGameState() {
+        score = 0;
+        health = 100;
+        level = 1;
+        enemies = [];
+        particles = [];
+        quizIntervalCounter = 0;
+        spawnInterval = 2000;
+        updateUI();
+    }
+
+    function resetGame() {
+        startGame();
+    }
+
+    function spawnEnemy() {
+        // Spawn from edges
+        const side = Math.floor(Math.random() * 4); // 0:top, 1:right, 2:bottom, 3:left
+        let x, y;
+        const buffer = 50;
+        
+        switch(side) {
+            case 0: x = Math.random() * canvas.width; y = -buffer; break;
+            case 1: x = canvas.width + buffer; y = Math.random() * canvas.height; break;
+            case 2: x = Math.random() * canvas.width; y = canvas.height + buffer; break;
+            case 3: x = -buffer; y = Math.random() * canvas.height; break;
+        }
+
+        const angle = Math.atan2(DOKDO.y - y, DOKDO.x - x);
+        const speed = 1 + (level * 0.2) + (Math.random() * 1);
+        
+        // Enemy types
+        const type = Math.random() > 0.8 ? 'FAST' : 'NORMAL';
+
+        enemies.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: type === 'FAST' ? 25 : 35,
+            color: type === 'FAST' ? '#F87171' : '#A78BFA', // Red or Purple
+            text: type === 'FAST' ? '왜곡' : '망언',
+            hp: type === 'FAST' ? 1 : 2,
+            type: type
+        });
+    }
+
+    function createParticles(x, y, color) {
+        for(let i=0; i<8; i++) {
+            particles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 5,
+                vy: (Math.random() - 0.5) * 5,
+                life: 1.0,
+                color: color
+            });
+        }
+    }
+
+    function update(dt) {
+        if (gameState !== 'playing') return;
+
+        // Spawning
+        spawnTimer += dt;
+        if (spawnTimer > spawnInterval) {
+            spawnEnemy();
+            spawnTimer = 0;
+            // Increase difficulty
+            if (spawnInterval > 500) spawnInterval -= 10;
+        }
+
+        // Update Enemies
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            let e = enemies[i];
+            e.x += e.vx;
+            e.y += e.vy;
+
+            // Collision with Dokdo
+            const dist = Math.hypot(e.x - DOKDO.x, e.y - DOKDO.y);
+            if (dist < DOKDO.radius + e.radius) {
+                health -= 10;
+                createParticles(e.x, e.y, '#EF4444');
+                enemies.splice(i, 1);
+                updateUI();
+                
+                // Shake effect
+                canvas.style.transform = `translate(${Math.random()*10-5}px, ${Math.random()*10-5}px)`;
+                setTimeout(() => canvas.style.transform = 'none', 50);
+
+                if (health <= 0) {
+                    gameState = 'gameover';
+                    document.getElementById('finalScore').innerText = score;
+                    document.getElementById('gameOverScreen').classList.remove('hidden');
+                }
+            }
+        }
+
+        // Update Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.05;
+            if (p.life <= 0) particles.splice(i, 1);
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw Dokdo (Center)
+        ctx.beginPath();
+        ctx.arc(DOKDO.x - 20, DOKDO.y, 40, 0, Math.PI * 2); // West Islet
+        ctx.fillStyle = '#10B981';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(DOKDO.x + 20, DOKDO.y - 10, 35, 0, Math.PI * 2); // East Islet
+        ctx.fillStyle = '#059669';
+        ctx.fill();
+        
+        // Korean Flag on Dokdo
+        ctx.font = '30px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🇰🇷', DOKDO.x, DOKDO.y - 40);
+
+        // Shield Effect
+        if (health > 0) {
+            ctx.beginPath();
+            ctx.arc(DOKDO.x, DOKDO.y, DOKDO.radius + 10, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(100, 200, 255, ${health/200})`;
+            ctx.lineWidth = 5;
+            ctx.stroke();
+        }
+
+        // Draw Enemies
+        enemies.forEach(e => {
+            ctx.beginPath();
+            ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+            ctx.fillStyle = e.color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Ghost Face
+            ctx.fillStyle = 'white';
+            ctx.font = '20px Arial';
+            ctx.fillText('👻', e.x, e.y - 5);
+            ctx.font = '12px Noto Sans KR';
+            ctx.fillText(e.text, e.x, e.y + 15);
+        });
+
+        // Draw Particles
+        particles.forEach(p => {
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+        });
+    }
+
+    function gameLoop(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const dt = timestamp - lastTime;
+        lastTime = timestamp;
+
+        update(dt);
+        draw();
+
+        if (gameState === 'playing') {
+            requestAnimationFrame(gameLoop);
+        }
+    }
+
+    /* --- Input Handling --- */
+    window.addEventListener('pointerdown', (e) => {
+        if (gameState !== 'playing') return;
+
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        for (let i = enemies.length - 1; i >= 0; i--) {
+            const ent = enemies[i];
+            const dist = Math.hypot(clickX - ent.x, clickY - ent.y);
+
+            // Hit detection (Generous box)
+            if (dist < ent.radius + 20) {
+                ent.hp--;
+                createParticles(ent.x, ent.y, '#FFFF00');
+                
+                if (ent.hp <= 0) {
+                    enemies.splice(i, 1);
+                    addScore(100);
+                } else {
+                    // Knockback
+                    ent.x -= ent.vx * 10;
+                    ent.y -= ent.vy * 10;
+                }
+                break; // Click one at a time
+            }
+        }
+    });
+
+    function addScore(points) {
+        score += points;
+        quizIntervalCounter += points;
+        
+        // Level Up logic
+        if (score % 2000 === 0) {
+            level++;
+        }
+
+        // Trigger Quiz
+        if (quizIntervalCounter >= quizThreshold) {
+            triggerQuiz();
+            quizIntervalCounter = 0;
+        }
+        updateUI();
+    }
+
+    function updateUI() {
+        document.getElementById('scoreDisplay').innerText = score;
+        document.getElementById('healthDisplay').innerText = health;
+        document.getElementById('levelDisplay').innerText = level;
+    }
+
+    /* --- Quiz System --- */
+    function triggerQuiz() {
+        gameState = 'quiz';
+        const modal = document.getElementById('quizModal');
+        const qContainer = document.getElementById('quizQuestion');
+        const oContainer = document.getElementById('quizOptions');
+        const timerDisplay = document.getElementById('quizTimer');
+
+        // Pick random question
+        const qIndex = Math.floor(Math.random() * QUIZ_DATA.length);
+        const qData = QUIZ_DATA[qIndex];
+        currentQuizIndex = qIndex;
+
+        qContainer.innerText = `Q. ${qData.q}`;
+        oContainer.innerHTML = '';
+
+        qData.a.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-btn w-full text-left bg-gray-100 hover:bg-blue-100 border border-gray-300 rounded-lg p-3 text-gray-800 font-bold';
+            btn.innerText = `(${idx+1}) ${opt}`;
+            btn.onclick = () => checkAnswer(idx);
+            oContainer.appendChild(btn);
+        });
+
+        modal.classList.remove('hidden');
+
+        // Timer logic
+        let timeLeft = 15;
+        timerDisplay.innerText = timeLeft + 's';
+        clearInterval(quizTimerInterval);
+        quizTimerInterval = setInterval(() => {
+            timeLeft--;
+            timerDisplay.innerText = timeLeft + 's';
+            if (timeLeft <= 0) {
+                clearInterval(quizTimerInterval);
+                closeQuiz(false);
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIndex) {
+        clearInterval(quizTimerInterval);
+        const isCorrect = selectedIndex === QUIZ_DATA[currentQuizIndex].correct;
+        const btns = document.querySelectorAll('.quiz-btn');
+        
+        btns[selectedIndex].classList.remove('bg-gray-100', 'hover:bg-blue-100');
+        
+        if (isCorrect) {
+            btns[selectedIndex].classList.add('bg-green-500', 'text-white');
+            setTimeout(() => closeQuiz(true), 1000);
+        } else {
+            btns[selectedIndex].classList.add('bg-red-500', 'text-white');
+            // Show correct answer
+            btns[QUIZ_DATA[currentQuizIndex].correct].classList.add('bg-green-500', 'text-white', 'ring-2', 'ring-green-700');
+            setTimeout(() => closeQuiz(false), 2000); // Wait longer to see answer
+        }
+    }
+
+    function closeQuiz(success) {
+        document.getElementById('quizModal').classList.add('hidden');
+        
+        if (success) {
+            health = Math.min(100, health + 30); // Heal
+            score += 500; // Bonus score
+            // Clear all enemies on screen as a "Bomb" effect
+            enemies.forEach(e => createParticles(e.x, e.y, '#FFFFFF'));
+            enemies = [];
+            
+            // Show success text
+            const msg = document.createElement('div');
+            msg.innerText = "정답! 방어막 회복!";
+            msg.className = "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-bold text-green-400 font-jua z-50 animate-bounce";
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 1500);
+
+        } else {
+            // Failure penalty
+            createParticles(DOKDO.x, DOKDO.y, '#000000');
+        }
+
+        updateUI();
+        gameState = 'playing';
+        lastTime = performance.now(); // Reset time to prevent huge dt jump
+        requestAnimationFrame(gameLoop);
+    }
+
+</script>
+</body>
+</html>
