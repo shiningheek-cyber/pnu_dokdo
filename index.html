@@ -10,8 +10,8 @@
     <style>
         body { 
             font-family: 'Noto Sans KR', sans-serif; 
-            background-color: #fdfbf7; /* 따뜻한 미색 배경 */
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d1d5db' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-color: #fff5f7; /* 따뜻한 베이비 핑크 배경 */
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23fb7185' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         
         /* Typography Classes */
@@ -57,7 +57,7 @@
             height: 120px;
         }
         .custom-shape-divider-bottom .shape-fill {
-            fill: #fdfbf7;
+            fill: #fff5f7; /* 배경색과 동일하게 수정 */
         }
 
         /* Navigation Link Hover */
@@ -71,7 +71,7 @@
             height: 2px;
             bottom: -4px;
             left: 0;
-            background-color: #93c5fd;
+            background-color: #fda4af; /* 핑크색 하이라이트 */
             transition: width 0.3s ease;
             border-radius: 2px;
         }
@@ -87,9 +87,9 @@
         <div class="container mx-auto px-6 py-6 flex justify-between items-center">
             <a href="index.html" class="group flex flex-col items-center">
                 <span class="text-2xl font-bold text-white font-batang tracking-widest group-hover:opacity-90 transition">독도</span>
-                <span class="text-sm text-blue-200 font-pen tracking-widest -mt-1 group-hover:text-white transition">KOREA</span>
+                <span class="text-sm text-pink-100 font-pen tracking-widest -mt-1 group-hover:text-white transition">KOREA</span>
             </a>
-            <div class="hidden md:flex space-x-10 text-base font-batang text-blue-100">
+            <div class="hidden md:flex space-x-10 text-base font-batang text-pink-50">
                 <a href="01.html" class="nav-link hover:text-white transition">정부정책</a>
                 <a href="02.html" class="nav-link hover:text-white transition">역사연표</a>
                 <a href="03.html" class="nav-link hover:text-white transition">용어사전</a>
@@ -99,35 +99,35 @@
     </nav>
 
     <!-- Hero Section -->
-    <header class="relative h-[700px] flex items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900 overflow-hidden">
+    <header class="relative h-[700px] flex items-center justify-center bg-gradient-to-br from-pink-400 via-rose-400 to-pink-300 overflow-hidden">
         
         <!-- Organic Background Shapes (Blurred Blobs) -->
-        <div class="absolute top-20 left-10 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-        <div class="absolute bottom-20 right-10 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="absolute top-20 left-10 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse" style="animation-delay: 2s;"></div>
 
         <!-- Main Content -->
         <div class="container mx-auto px-6 text-center relative z-20 mt-10">
             <div class="inline-block mb-6 transform -rotate-2">
-                <span class="px-6 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-blue-100 text-xl font-pen rounded-full shadow-lg">
+                <span class="px-6 py-2 bg-white/20 backdrop-blur-md border border-white/30 text-pink-50 text-xl font-pen rounded-full shadow-lg">
                     ✨ 대한민국 동쪽 끝, 우리의 자존심
                 </span>
             </div>
             
-            <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-blue-200 mb-8 font-batang leading-tight drop-shadow-lg">
+            <h1 class="text-6xl md:text-7xl lg:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-pink-50 to-rose-100 mb-8 font-batang leading-tight drop-shadow-md">
                 독도,<br>
-                <span class="text-4xl md:text-5xl lg:text-6xl font-normal block mt-4">기록이 전하는 진실</span>
+                <span class="text-4xl md:text-5xl lg:text-6xl font-normal block mt-4 text-white">기록이 전하는 진실</span>
             </h1>
             
-            <p class="text-xl text-blue-200/90 max-w-2xl mx-auto font-light mb-12 leading-relaxed font-batang">
+            <p class="text-xl text-pink-50 max-w-2xl mx-auto font-light mb-12 leading-relaxed font-batang">
                 바위섬 하나하나에 새겨진 500년의 역사.<br>
                 우리의 관심이 독도를 지키는 가장 단단한 방파제입니다.
             </p>
             
             <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
-                <a href="01.html" class="btn-hand px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white text-lg font-batang font-bold shadow-xl shadow-blue-900/40 relative overflow-hidden group">
+                <a href="01.html" class="btn-hand px-10 py-4 bg-white text-rose-500 hover:bg-rose-50 hover:text-rose-600 text-lg font-batang font-bold shadow-xl shadow-rose-900/20 relative overflow-hidden group">
                     <span class="relative z-10">정책 바로알기 🇰🇷</span>
                 </a>
-                <a href="02.html" class="btn-hand px-10 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white text-lg font-batang transition shadow-lg">
+                <a href="02.html" class="btn-hand px-10 py-4 bg-rose-500/30 hover:bg-rose-500/40 backdrop-blur-sm border-2 border-white/40 text-white text-lg font-batang transition shadow-lg">
                     역사 여행 떠나기 🧭
                 </a>
             </div>
@@ -283,7 +283,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-stone-900 text-stone-400 py-16 border-t-4 border-blue-900 relative">
+    <footer class="bg-stone-900 text-stone-400 py-16 border-t-4 border-rose-300 relative">
         <div class="container mx-auto px-6 text-center">
             <h4 class="text-white font-batang text-2xl mb-4">Dokdo Archive Project</h4>
             <p class="text-stone-500 text-sm mb-8 font-sans">올바른 역사가 평화를 만듭니다. 우리는 기록합니다.</p>
